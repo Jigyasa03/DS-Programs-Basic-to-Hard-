@@ -1,0 +1,48 @@
+#include <stdio.h>
+
+int main() {
+    int a[10][10];
+    int r, c;
+    int sumDiag = 0, sumRevDiag = 0, sumCorner = 0;
+
+    printf("Enter number of rows and columns: ");
+    scanf("%d %d", &r, &c);
+
+    printf("Enter matrix elements:\n");
+    for(int i = 0; i < r; i++) {
+        for(int j = 0; j < c; j++) {
+            scanf("%d", &a[i][j]);
+        }
+    }
+
+    // Check for square matrix
+    if(r != c) {
+        printf("The given matrix is NOT a square matrix.\n");
+        return 0;
+    }
+
+    printf("The given matrix IS a square matrix.\n");
+
+    // Sum of diagonal, reverse diagonal and corner elements
+    for(int i = 0; i < r; i++) {
+        for(int j = 0; j < c; j++) {
+
+            // Main diagonal
+            if(i == j)
+                sumDiag += a[i][j];
+
+            // Reverse diagonal
+            if(i + j == r - 1)
+                sumRevDiag += a[i][j];
+        }
+    }
+
+    // Corner elements
+    sumCorner = a[0][0] + a[0][c-1] + a[r-1][0] + a[r-1][c-1];
+
+    printf("Sum of Main Diagonal Elements = %d\n", sumDiag);
+    printf("Sum of Reverse Diagonal Elements = %d\n", sumRevDiag);
+    printf("Sum of Corner Elements = %d\n", sumCorner);
+
+    return 0;
+}
