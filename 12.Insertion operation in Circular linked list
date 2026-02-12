@@ -1,0 +1,129 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+struct node *head = NULL;
+
+/* Insert at Beginning */
+void insert_begin() {
+    struct node *newnode, *temp;
+    newnode = (struct node *)malloc(sizeof(struct node));
+
+    printf("Enter data: ");
+    scanf("%d", &newnode->data);
+
+    if (head == NULL) {
+        head = newnode;
+        newnode->next = head;
+    } else {
+        temp = head;
+        while (temp->next != head)
+            temp = temp->next;
+
+        newnode->next = head;
+        temp->next = newnode;
+        head = newnode;
+    }
+}
+
+/* Insert at End */
+void insert_end() {
+    struct node *newnode, *temp;
+    newnode = (struct node *)malloc(sizeof(struct node));
+
+    printf("Enter data: ");
+    scanf("%d", &newnode->data);
+
+    if (head == NULL) {
+        head = newnode;
+        newnode->next = head;
+    } else {
+        temp = head;
+        while (temp->next != head)
+            temp = temp->next;
+
+        temp->next = newnode;
+        newnode->next = head;
+    }
+}
+
+/* Insert at Specific Position */
+void insert_position() {
+    struct node *newnode, *temp;
+    int pos, i = 1;
+
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    printf("Enter position: ");
+    scanf("%d", &pos);
+
+    if (pos == 1) {
+        insert_begin();
+        return;
+    }
+
+    newnode = (struct node *)malloc(sizeof(struct node));
+    printf("Enter data: ");
+    scanf("%d", &newnode->data);
+
+    temp = head;
+    while (i < pos - 1 && temp->next != head) {
+        temp = temp->next;
+        i++;
+    }
+
+    newnode->next = temp->next;
+    temp->next = newnode;
+}
+
+/* Display Circular Linked List */
+void display() {
+    struct node *temp;
+
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    temp = head;
+    printf("Circular Linked List: ");
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("(head)\n");
+}
+
+/* Main Function */
+int main() {
+    int choice;
+
+    do {
+        printf("\n--- CIRCULAR LINKED LIST MENU ---\n");
+        printf("1. Insert at Beginning\n");
+        printf("2. Insert at End\n");
+        printf("3. Insert at Specific Position\n");
+        printf("4. Display\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: insert_begin(); break;
+            case 2: insert_end(); break;
+            case 3: insert_position(); break;
+            case 4: display(); break;
+            case 5: printf("Exiting...\n"); break;
+            default: printf("Invalid choice\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
