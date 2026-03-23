@@ -1,0 +1,279 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+struct Node* head = NULL;
+
+// Create node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = newNode->next = NULL;
+    return newNode;
+}
+
+
+void insertBeginning(int data) {
+    struct Node* newNode = createNode(data);
+
+    if (head != NULL) {
+        head->prev = newNode;
+        newNode->next = head;
+    }
+    head = newNode;
+}
+
+void insertEnd(int data) {
+    struct Node* newNode = createNode(data);
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+
+void insertAfter(int key, int data) {
+    struct Node* temp = head;
+
+    while (temp != NULL && temp->data != key)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Node not found\n");
+        return;
+    }
+
+    struct Node* newNode = createNode(data);
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+
+    if (temp->next != NULL)
+        temp->next->prev = newNode;
+
+    temp->next = newNode;
+}
+
+
+void insertBefore(int key, int data) {
+    struct Node* temp = head;
+
+    if (temp == NULL) return;
+
+    if (temp->data == key) {
+        insertBeginning(data);
+        return;
+    }
+
+    while (temp != NULL && temp->data != key)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Node not found\n");
+        return;
+    }
+
+    struct Node* newNode = createNode(data);
+
+    newNode->prev = temp->prev;
+    newNode->next = temp;
+
+    temp->prev->next = newNode;
+    temp->prev = newNode;
+}
+
+
+void insertPosition(int pos, int data) {
+    if (pos == 1) {
+        insertBeginning(data);
+        return;
+    }
+
+    struct Node* temp = head;
+    for (int i = 1; i < pos - 1 && temp != NULL; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Invalid position\n");
+        return;
+    }
+
+    struct Node* newNode = createNode(data);
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+
+    if (temp->next != NULL)
+        temp->next->prev = newNode;
+
+    temp->next = newNode;
+}
+
+
+void deleteBeginning() {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+    head = head->next;
+
+    if (head != NULL)
+        head->prev = NULL;
+
+    free(temp);
+}
+
+
+void deleteEnd() {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    if (temp->next == NULL) {
+        free(temp);
+        head = NULL;
+        return;
+    }
+
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->prev->next = NULL;
+    free(temp);
+}
+
+
+void deleteAfter(int key) {
+    struct Node* temp = head;
+
+    while (temp != NULL && temp->data != key)
+        temp = temp->next;
+
+    if (temp == NULL || temp->next == NULL) {
+        printf("Deletion not possible\n");
+        return;
+    }
+
+    struct Node* del = temp->next;
+
+    temp->next = del->next;
+
+    if (del->next != NULL)
+        del->next->prev = temp;
+
+    free(del);
+}
+
+void deleteBefore(int key) {
+    struct Node* temp = head;
+
+    if (temp == NULL || temp->next == NULL) return;
+
+    while (temp != NULL && temp->data != key)
+        temp = temp->next;
+
+    if (temp == NULL || temp->prev == NULL) {
+        printf("Deletion not possible\n");
+        return;
+    }
+
+    struct Node* del = temp->prev;
+
+    if (del->prev != NULL)
+        del->prev->next = temp;
+    else
+        head = temp;
+
+    temp->prev = del->prev;
+
+    free(del);
+}
+
+
+void deletePosition(int pos) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    if (pos == 1) {
+        deleteBeginning();
+        return;
+    }
+
+    for (int i = 1; i < pos && temp != NULL; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Invalid position\n");
+        return;
+    }
+
+    if (temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    if (temp->prev != NULL)
+        temp->prev->next = temp->next;
+
+    free(temp);
+}
+
+
+void display() {
+    struct Node* temp = head;
+
+    if (temp == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    printf("NULL <-> ");
+    while (temp != NULL) {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+// Main menu
+int main() {
+    int choice, data, key, pos;
+
+    while (1) {
+        printf("\n--- DOUBLY LINKED LIST MENU ---\n");
+        printf("1.Insert Beginning\n2.Insert End\n3.Insert After\n4.Insert Before\n");
+        printf("5.Insert Position\n6.Delete Beginning\n7.Delete End\n");
+        printf("8.Delete After\n9.Delete Before\n10.Delete Position\n");
+        printf("11.Display\n0.Exit\n");
+
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: scanf("%d", &data); insertBeginning(data); break;
+            case 2: scanf("%d", &data); insertEnd(data); break;
+            case 3: scanf("%d %d", &key, &data); insertAfter(key, data); break;
+            case 4: scanf("%d %d", &key, &data); insertBefore(key, data); break;
+            case 5: scanf("%d %d", &pos, &data); insertPosition(pos, data); break;
+            case 6: deleteBeginning(); break;
+            case 7: deleteEnd(); break;
+            case 8: scanf("%d", &key); deleteAfter(key); break;
+            case 9: scanf("%d", &key); deleteBefore(key); break;
+            case 10: scanf("%d", &pos); deletePosition(pos); break;
+            case 11: display(); break;
+            case 0: exit(0);
+            default: printf("Invalid choice\n");
+        }
+    }
+}
