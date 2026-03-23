@@ -1,0 +1,296 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *prev, *next;
+};
+
+struct Node* head = NULL;
+
+// Create node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = newNode->next = newNode;
+    return newNode;
+}
+
+
+void insertBeginning(int data) {
+    struct Node* newNode = createNode(data);
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct Node* last = head->prev;
+
+    newNode->next = head;
+    newNode->prev = last;
+
+    last->next = head->prev = newNode;
+    head = newNode;
+}
+
+
+void insertEnd(int data) {
+    struct Node* newNode = createNode(data);
+
+    if (head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct Node* last = head->prev;
+
+    newNode->next = head;
+    newNode->prev = last;
+
+    last->next = head->prev = newNode;
+}
+
+
+void insertAfter(int key, int data) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    do {
+        if (temp->data == key) {
+            struct Node* newNode = createNode(data);
+
+            newNode->next = temp->next;
+            newNode->prev = temp;
+
+            temp->next->prev = newNode;
+            temp->next = newNode;
+            return;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("Node not found\n");
+}
+
+
+void insertBefore(int key, int data) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    do {
+        if (temp->data == key) {
+            struct Node* newNode = createNode(data);
+
+            newNode->prev = temp->prev;
+            newNode->next = temp;
+
+            temp->prev->next = newNode;
+            temp->prev = newNode;
+
+            if (temp == head)
+                head = newNode;
+
+            return;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("Node not found\n");
+}
+
+
+void insertPosition(int pos, int data) {
+    if (pos == 1) {
+        insertBeginning(data);
+        return;
+    }
+
+    if (head == NULL) {
+        printf("Invalid position\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    for (int i = 1; i < pos - 1; i++) {
+        temp = temp->next;
+        if (temp == head) {
+            printf("Invalid position\n");
+            return;
+        }
+    }
+
+    struct Node* newNode = createNode(data);
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+
+    temp->next->prev = newNode;
+    temp->next = newNode;
+}
+
+
+void deleteBeginning() {
+    if (head == NULL) return;
+
+    if (head->next == head) {
+        free(head);
+        head = NULL;
+        return;
+    }
+
+    struct Node* last = head->prev;
+    struct Node* temp = head;
+
+    head = head->next;
+    head->prev = last;
+    last->next = head;
+
+    free(temp);
+}
+
+
+void deleteEnd() {
+    if (head == NULL) return;
+
+    if (head->next == head) {
+        free(head);
+        head = NULL;
+        return;
+    }
+
+    struct Node* last = head->prev;
+    struct Node* secondLast = last->prev;
+
+    secondLast->next = head;
+    head->prev = secondLast;
+
+    free(last);
+}
+
+
+void deleteAfter(int key) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    do {
+        if (temp->data == key) {
+            struct Node* del = temp->next;
+
+            if (del == head)
+                head = head->next;
+
+            temp->next = del->next;
+            del->next->prev = temp;
+
+            free(del);
+            return;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("Node not found\n");
+}
+
+
+void deleteBefore(int key) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+
+    do {
+        if (temp->data == key) {
+            struct Node* del = temp->prev;
+
+            if (del == head)
+                head = head->next;
+
+            del->prev->next = temp;
+            temp->prev = del->prev;
+
+            free(del);
+            return;
+        }
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("Node not found\n");
+}
+
+
+void deletePosition(int pos) {
+    if (head == NULL) return;
+
+    if (pos == 1) {
+        deleteBeginning();
+        return;
+    }
+
+    struct Node* temp = head;
+
+    for (int i = 1; i < pos; i++) {
+        temp = temp->next;
+        if (temp == head) {
+            printf("Invalid position\n");
+            return;
+        }
+    }
+
+    temp->prev->next = temp->next;
+    temp->next->prev = temp->prev;
+
+    free(temp);
+}
+
+
+void display() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+
+    struct Node* temp = head;
+
+    printf("List: ");
+    do {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+
+    printf("(back to head)\n");
+}
+
+
+int main() {
+    int choice, data, key, pos;
+
+    while (1) {
+        printf("\n--- CIRCULAR DOUBLY LINKED LIST MENU ---\n");
+        printf("1.Insert Beginning\n2.Insert End\n3.Insert After\n4.Insert Before\n");
+        printf("5.Insert Position\n6.Delete Beginning\n7.Delete End\n");
+        printf("8.Delete After\n9.Delete Before\n10.Delete Position\n");
+        printf("11.Display\n0.Exit\n");
+
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: scanf("%d", &data); insertBeginning(data); break;
+            case 2: scanf("%d", &data); insertEnd(data); break;
+            case 3: scanf("%d %d", &key, &data); insertAfter(key, data); break;
+            case 4: scanf("%d %d", &key, &data); insertBefore(key, data); break;
+            case 5: scanf("%d %d", &pos, &data); insertPosition(pos, data); break;
+            case 6: deleteBeginning(); break;
+            case 7: deleteEnd(); break;
+            case 8: scanf("%d", &key); deleteAfter(key); break;
+            case 9: scanf("%d", &key); deleteBefore(key); break;
+            case 10: scanf("%d", &pos); deletePosition(pos); break;
+            case 11: display(); break;
+            case 0: exit(0);
+            default: printf("Invalid choice\n");
+        }
+    }
+}
